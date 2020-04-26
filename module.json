@@ -1,0 +1,11 @@
+{
+    "name": "custom-critical",
+    "title": "Custom Critical Hit",
+    "description": "Implement various house rules for critical hits and allow selection of these rules on a per-actor basis.",
+    "version": "0.1.0",
+    "author": "Leo Baldock",
+    "esmodules": ["customCritical.js"],
+    "compatibleCoreVersion": "0.5.5",
+    "minimumCoreVersion": "0.5.5",
+    "systems": ["dnd5e"]
+  }
