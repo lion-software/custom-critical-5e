@@ -10,5 +10,5 @@
     "systems": ["dnd5e"],
     "url": "https://github.com/lion-software/custom-critical-5e",
     "manifest": "https://raw.githubusercontent.com/lion-software/custom-critical-5e/master/module.json",
-    "download": "https://github.com/lion-software/custom-critical-5e/archive/master.zip"
+    "download": "https://github.com/lion-software/custom-critical-5e/archive/v0.1.1.zip"
   }
