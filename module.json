@@ -2,13 +2,13 @@
     "name": "custom-critical-5e",
     "title": "Custom Critical Hits 5e",
     "description": "Implement various house rules for critical hits and allow selection of these rules on a per-actor basis.",
-    "version": "0.1.0",
-    "author": "Leo Baldock",
+    "version": "0.2.0",
+    "author": "Leo Baldock [TheHippyHermit#6867]",
     "esmodules": ["customCritical.js"],
     "compatibleCoreVersion": "0.5.5",
     "minimumCoreVersion": "0.5.5",
     "systems": ["dnd5e"],
     "url": "https://github.com/lion-software/custom-critical-5e",
-    "manifest": "https://raw.githubusercontent.com/lion-software/custom-critical-5e/master/module.json",
-    "download": "https://github.com/lion-software/custom-critical-5e/archive/v0.1.1.zip"
+    "manifest": "https://raw.githubusercontent.com/lion-software/custom-critical-5e/v0.2.0/module.json",
+    "download": "https://github.com/lion-software/custom-critical-5e/archive/v0.2.0.zip"
   }

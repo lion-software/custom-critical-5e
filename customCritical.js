@@ -1,38 +1,32 @@
 import { Dice5e } from "../../systems/dnd5e/module/dice.js";
 
-const CRIT_RULES = [
-  "Roll Double Dice",
-  "Maxed Dice + Rolled Dice + Modifiers",
-];
+const CRIT_RULES = {
+  RAW: "Roll Double Dice (RAW)",
+  "Max+Roll": "Maxed Dice + Rolled Dice + Modifiers",
+};
 
-const CRIT_FUNCTIONS = CRIT_RULES.map((name) => {
-  switch (name) {
-    case "Roll Double Dice":
-      return (parts, data) => {
-        let roll = new Roll(parts.join("+"), data);
-        roll.alter(0, 2);
-        return roll;
-      };
-    case "Maxed Dice + Rolled Dice + Modifiers":
-      return (parts, data) => {
-        let roll = new Roll(parts.join("+"), data).roll();
-        let maxedDice = roll.parts
-          .filter((p) => {
-            return p instanceof Die;
-          })
-          .map((d) => {
-            return d.faces * d.rolls.length;
-          })
-          .reduce((sum, val) => {
-            return sum + val;
-          });
-        let newParts = [maxedDice, ...parts];
-        return new Roll(newParts.join("+"), data);
-      };
-    default:
-      throw "That critical rule does not exist!";
-  }
-});
+const CRIT_FUNCTIONS = {
+  RAW: (parts, data) => {
+    let roll = new Roll(parts.join("+"), data);
+    roll.alter(0, 2);
+    return roll;
+  },
+  "Max+Roll": (parts, data) => {
+    let roll = new Roll(parts.join("+"), data).roll();
+    let maxedDice = roll.parts
+      .filter((p) => {
+        return p instanceof Die;
+      })
+      .map((d) => {
+        return d.faces * d.rolls.length;
+      })
+      .reduce((sum, val) => {
+        return sum + val;
+      });
+    let newParts = [maxedDice, ...parts];
+    return new Roll(newParts.join("+"), data);
+  },
+};
 
 export class CustomCritical {
   /**
@@ -80,11 +74,18 @@ export class CustomCritical {
 
       let roll = new Roll(parts.join("+"), data);
 
+      console.log(actor.getFlag("dnd5e", "criticalHitDamageRule"));
+
       // Modify the damage formula for critical hits
       if (crit === true) {
         let critRule = actor.getFlag("dnd5e", "criticalHitDamageRule");
-        let functionIndex = critRule ? critRule : 0;
-        roll = CRIT_FUNCTIONS[functionIndex](parts, data); // Override the Roll with the new crit Roll
+        let critFunc;
+        if(critRule == "Default") {
+          critFunc = CRIT_FUNCTIONS[game.settings.get("custom-critical-5e", "defaultRule")]
+        } else {
+          critFunc = CRIT_FUNCTIONS[critRule]
+        }
+        roll = critFunc(parts, data); // Override the Roll with the new crit Roll
 
         let add = actor && actor.getFlag("dnd5e", "savageAttacks") ? 1 : 0;
         roll.alter(add, 1);
@@ -152,6 +153,24 @@ export class CustomCritical {
 }
 
 /**
+ * Register settings data.
+ */
+function registerModuleSettings() {
+  game.settings.register("custom-critical-5e", "defaultRule", {
+    name: "Default Rule",
+    hint: "Set the default rule for critical hit damage.",
+    scope: "world",
+    config: true,
+    type: String,
+    default: "RAW",
+    choices: CRIT_RULES,
+    onChange: (s) => {
+      //some callback
+    },
+  });
+}
+
+/**
  * Adds a Critical Hit Damage Rule flag in the Special Traits section of the character sheet.
  */
 function addCriticalDamageFlag() {
@@ -160,11 +179,18 @@ function addCriticalDamageFlag() {
     hint: "Allow for customised critical damage rules.",
     section: "Feats",
     type: String,
-    choices: CRIT_RULES,
+    choices: {
+      Default: "Default",
+      ...CRIT_RULES,
+    },
   };
 }
 
 Hooks.on("ready", () => {
   Dice5e.damageRoll = CustomCritical.damageRoll;
   addCriticalDamageFlag();
+});
+
+Hooks.once("init", () => {
+  registerModuleSettings();
 });
